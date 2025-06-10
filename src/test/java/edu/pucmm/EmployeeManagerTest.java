@@ -6,8 +6,15 @@ import org.junit.jupiter.api.Test;
 import edu.pucmm.exception.DuplicateEmployeeException;
 import edu.pucmm.exception.EmployeeNotFoundException;
 import edu.pucmm.exception.InvalidSalaryException;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 /**
  * @author me@fredpena.dev
@@ -130,18 +137,37 @@ public class EmployeeManagerTest {
         });
     }
 
-    @Test
-    public void testIsSalaryValidForPosition() {
-        // TODO: Verificar la lógica de validación de salario para diferentes posiciones.
-        // - Verificar que un salario de 40000 es válido para juniorDeveloper.
-        // - Verificar que un salario de 60000 no es válido para juniorDeveloper.
-        // - Verificar que un salario de 70000 es válido para seniorDeveloper.
-        // - Verificar que un salario de 50000 no es válido para seniorDeveloper.
-        employeeManager.isSalaryValidForPosition(juniorDeveloper, 40000);
-        employeeManager.isSalaryValidForPosition(juniorDeveloper, 60000);
-        employeeManager.isSalaryValidForPosition(seniorDeveloper, 70000);
-        employeeManager.isSalaryValidForPosition(seniorDeveloper, 50000);
-        assertTrue(true);
+    @ParameterizedTest
+    @CsvSource({
+            "Junior Developer, 30000, 50000, 35000, true",  // Salario válido para Junior
+            "Junior Developer, 30000, 50000, 55000, false", // Salario por encima del rango Junior
+            "Junior Developer, 30000, 50000, 25000, false", // Salario por debajo del rango Junior
+            "Senior Developer, 60000, 90000, 75000, true",  // Salario válido para Senior
+            "Senior Developer, 60000, 90000, 55000, false", // Salario por debajo del rango Senior
+            "Senior Developer, 60000, 90000, 95000, false"  // Salario por encima del rango Senior
+    })
+    void testSalaryValidationForPositions(String positionName, double minSalary,
+                                          double maxSalary, double salaryToTest,
+                                          boolean expectedResult) {
+        Position position = new Position("TEST", positionName, minSalary, maxSalary);
+        assertEquals(expectedResult, employeeManager.isSalaryValidForPosition(position, salaryToTest));
+    }
+
+    private static Stream<Arguments> provideSalaryTestCases() {
+        return Stream.of(
+                arguments(new Position("J1", "Junior Developer", 30000, 50000), 35000, true),
+                arguments(new Position("J2", "Junior Developer", 30000, 50000), 55000, false),
+                arguments(new Position("S1", "Senior Developer", 60000, 90000), 75000, true),
+                arguments(new Position("S2", "Senior Developer", 60000, 90000), 55000, false),
+                arguments(new Position("TL", "Team Lead", 80000, 120000), 100000, true),
+                arguments(new Position("TL", "Team Lead", 80000, 120000), 70000, false)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideSalaryTestCases")
+    void testSalaryValidationUsingMethodSource(Position position, double salary, boolean expectedResult) {
+        assertEquals(expectedResult, employeeManager.isSalaryValidForPosition(position, salary));
     }
     
     @Test
