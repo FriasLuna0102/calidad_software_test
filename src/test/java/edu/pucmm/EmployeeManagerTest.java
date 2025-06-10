@@ -7,10 +7,7 @@ import edu.pucmm.exception.DuplicateEmployeeException;
 import edu.pucmm.exception.EmployeeNotFoundException;
 import edu.pucmm.exception.InvalidSalaryException;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author me@fredpena.dev
@@ -191,4 +188,66 @@ public class EmployeeManagerTest {
             employeeManager.addEmployee(employee1);
         });
     }
+
+    @Test
+    public void testEmployeeSetters() {
+        Employee employee = new Employee("1", "John Doe", juniorDeveloper, 40000);
+
+        employee.setId("100")
+                .setName("Jane Doe")
+                .setPosition(seniorDeveloper)
+                .setSalary(80000);
+
+        assertEquals("100", employee.getId());
+        assertEquals("Jane Doe", employee.getName());
+        assertEquals(seniorDeveloper, employee.getPosition());
+        assertEquals(80000, employee.getSalary());
+    }
+
+    @Test
+    public void testEmployeeEqualsAndHashCode() {
+        Employee employee1Copy = new Employee("1", "Different Name", seniorDeveloper, 75000);
+        Employee differentEmployee = new Employee("2", "John Doe", juniorDeveloper, 40000);
+
+        assertEquals(employee1, employee1);
+        assertEquals(employee1, employee1Copy);
+        assertNotEquals(employee1, differentEmployee);
+        assertNotEquals(null, employee1);
+        assertNotEquals(new Object(), employee1);
+
+        assertEquals(employee1.hashCode(), employee1Copy.hashCode());
+        assertNotEquals(employee1.hashCode(), differentEmployee.hashCode());
+    }
+
+    @Test
+    public void testPositionSetters() {
+        Position position = new Position("1", "Test Position", 30000, 50000);
+
+        position.setId("100")
+                .setName("New Position")
+                .setMinSalary(40000)
+                .setMaxSalary(60000);
+
+        assertEquals("100", position.getId());
+        assertEquals("New Position", position.getName());
+        assertEquals(40000, position.getMinSalary());
+        assertEquals(60000, position.getMaxSalary());
+    }
+
+    @Test
+    public void testPositionEqualsAndHashCode() {
+        Position position1Copy = new Position("1", "Different Name", 35000, 55000);
+        Position differentPosition = new Position("2", "Test Position", 30000, 50000);
+
+        assertEquals(juniorDeveloper, juniorDeveloper);
+        assertEquals(juniorDeveloper, position1Copy);
+        assertNotEquals(juniorDeveloper, differentPosition);
+        assertNotEquals(null, juniorDeveloper);
+        assertNotEquals(new Object(), juniorDeveloper);
+
+        assertEquals(juniorDeveloper.hashCode(), position1Copy.hashCode());
+        assertNotEquals(juniorDeveloper.hashCode(), differentPosition.hashCode());
+    }
+
+
 }
